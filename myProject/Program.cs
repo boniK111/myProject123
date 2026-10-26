@@ -8,6 +8,9 @@ namespace TestSystem
         static void Main(string[] args)
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            MainMenu menu = new MainMenu();
+            menu.Show();
         }
     }
 }
