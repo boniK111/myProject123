@@ -15,27 +15,56 @@ public class DataStorage
 {
     private const string CategoriesFile = "categories.json";
     private const string ResultsFile = "results.json";
-    private readonly JsonSerializerOptions options = new() { WriteIndented = true };
+    private readonly JsonSerializerOptions options = new()
+    {
+        WriteIndented = true,
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
+
+    // ---------- Категории ----------
 
     public List<Category> loadCategories()
     {
         if (!File.Exists(CategoriesFile)) return new List<Category>();
         try
         {
-            return JsonSerializer.Deserialize<List<Category>>(File.ReadAllText(CategoriesFile), options)
-                   ?? new List<Category>();
+            List<Category>? list = JsonSerializer.Deserialize<List<Category>>(
+                File.ReadAllText(CategoriesFile), options);
+
+            if (list == null) return new List<Category>();
+
+            // Валидация после загрузки — отбрасываем битые категории
+            List<Category> valid = new();
+            foreach (Category c in list)
+            {
+                if (c.isValid(out string error))
+                    valid.Add(c);
+                else
+                    Console.WriteLine($"[warn] Категория «{c.name_}» пропущена: {error}");
+            }
+            return valid;
         }
-        catch
+        catch (Exception ex)
         {
-            Console.WriteLine("Не удалось прочитать categories.json.");
+            Console.WriteLine($"Не удалось прочитать {CategoriesFile}: {ex.Message}");
             return new List<Category>();
         }
     }
 
     public void saveCategories(List<Category> categories)
     {
-        File.WriteAllText(CategoriesFile, JsonSerializer.Serialize(categories, options));
+        // Валидация перед записью
+        foreach (Category c in categories)
+            if (!c.isValid(out string error))
+                throw new InvalidOperationException($"Категория «{c.name_}»: {error}");
+
+        // Атомарная запись: пишем во временный файл, затем подменяем
+        string temp = CategoriesFile + ".tmp";
+        File.WriteAllText(temp, JsonSerializer.Serialize(categories, options));
+        File.Move(temp, CategoriesFile, overwrite: true);
     }
+
+    // ---------- Результаты ----------
 
     public List<TestResult> LoadResults()
     {
@@ -47,7 +76,7 @@ public class DataStorage
         }
         catch
         {
-            Console.WriteLine("Не удалось прочитать results.json.");
+            Console.WriteLine($"Не удалось прочитать {ResultsFile}.");
             return new List<TestResult>();
         }
     }

@@ -122,6 +122,8 @@ public class Category
 
         points_ = questions_.Sum(q => q.countPoints());
         is_finished_ = true;
+        
+        showStats();
         Console.WriteLine($"\nТест завершён. Баллы: {points_} из {maxPoints()}");
     }
 
@@ -130,5 +132,20 @@ public class Category
         is_finished_ = true;
         points_ = questions_.Sum(q => q.countPoints());
         return points_;
+    }
+    public int answeredCount() => questions_.Count(q => q.is_resolved_);
+    public int correctCount() => questions_.Count(q => q.correct_);
+    public int wrongCount() => questions_.Count(q => q.is_resolved_ && !q.correct_);
+    public int skippedCount() => questions_.Count(q => !q.is_resolved_);
+
+    public void showStats()
+    {
+        Console.WriteLine($"=== Статистика: {name_} ===");
+        Console.WriteLine($"Всего вопросов: {questions_.Count}");
+        Console.WriteLine($"Отвечено:       {answeredCount()}");
+        Console.WriteLine($"  ✔ верно:      {correctCount()}");
+        Console.WriteLine($"  ✘ неверно:    {wrongCount()}");
+        Console.WriteLine($"Пропущено:      {skippedCount()}");
+        Console.WriteLine($"Баллы:          {points_} из {maxPoints()}");
     }
 }
