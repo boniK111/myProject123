@@ -1,16 +1,5 @@
-﻿
-using System;
+﻿using TestSystemCSharp;
 
-namespace TestSystem
-{
-    internal class Program
-    {
-        static void Main(string[] args)
-        {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-
-            MainMenu menu = new MainMenu();
-            menu.Show();
-        }
-    }
-}
+Console.OutputEncoding = System.Text.Encoding.UTF8;
+MainMenu menu = new();
+menu.Run();
