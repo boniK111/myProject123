@@ -3,6 +3,12 @@
 public class Administrator
 {
     public string name_ { get; set; } = "Администратор";
+    private readonly DataStorage storage;
+
+    public Administrator(DataStorage storage)
+    {
+        this.storage = storage;
+    }
 
     public void Run()
     {
@@ -19,14 +25,29 @@ public class Administrator
 
             switch (Console.ReadLine())
             {
-                case "1": Console.WriteLine("addCategory"); break;
-                case "2": Console.WriteLine("editCategory"); break;
-                case "3": Console.WriteLine("removeCategory"); break;
-                case "4": Console.WriteLine("howCategories"); break;
-                case "5": Console.WriteLine("ShowResults"); break;
+                case "1": Console.WriteLine("[следующий шаг] addCategory"); break;
+                case "2": Console.WriteLine("[следующий шаг] editCategory"); break;
+                case "3": Console.WriteLine("[следующий шаг] removeCategory"); break;
+                case "4": ShowCategories(); break;
+                case "5": ShowResults(); break;
                 case "0": return;
                 default: Console.WriteLine("Неверный пункт меню."); break;
             }
         }
+    }
+
+    private void ShowCategories()
+    {
+        List<Category> categories = storage.loadCategories();
+        if (categories.Count == 0) { Console.WriteLine("Категорий пока нет."); return; }
+        foreach (Category category in categories) { category.showInfo(); Console.WriteLine(); }
+    }
+
+    private void ShowResults()
+    {
+        List<TestResult> results = storage.LoadResults();
+        if (results.Count == 0) { Console.WriteLine("Результатов пока нет."); return; }
+        foreach (TestResult result in results.OrderByDescending(r => r.Date))
+            Console.WriteLine($"{result.Date:dd.MM.yyyy HH:mm} | {result.StudentName} | {result.CategoryName} | {result.Points}/{result.MaxPoints}");
     }
 }

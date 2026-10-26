@@ -3,12 +3,15 @@
 public class MainMenu
 {
     public string user_mode { get; private set; } = "";
+    public List<Category> categories { get; private set; } = new();
+    private readonly DataStorage storage = new();
     private string currentUserName = "";
 
     public void Run()
     {
         while (true)
         {
+            categories = loadCategories(); // автоподгрузка при каждом возврате в меню
             Console.WriteLine("\n=== СИСТЕМА ТЕСТИРОВАНИЯ ===");
             Console.WriteLine("1. Администратор");
             Console.WriteLine("2. Тестируемый");
@@ -23,7 +26,7 @@ public class MainMenu
                     if (login("admin"))
                     {
                         user_mode = "Administrator";
-                        new Administrator().Run();
+                        new Administrator(storage).Run();
                         logout();
                     }
                     break;
@@ -32,7 +35,7 @@ public class MainMenu
                     {
                         user_mode = "Tested";
                         Tested tested = new() { name_ = currentUserName };
-                        tested.Run();
+                        tested.Run(categories);
                         logout();
                     }
                     break;
@@ -80,4 +83,6 @@ public class MainMenu
         currentUserName = "";
         Console.WriteLine("Вы вышли из режима.");
     }
+
+    public List<Category> loadCategories() => storage.loadCategories();
 }
