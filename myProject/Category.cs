@@ -15,4 +15,17 @@ public class Category
         Console.WriteLine($"Максимум баллов: {questions_.Sum(q => q.points_)}");
         Console.WriteLine($"Статус: {(is_active_ ? "доступна" : "неактивна")}");
     }
+
+    public void addQuestion()
+    {
+        Question question = new();
+        question.edit();
+        questions_.Add(question);
+    }
+
+    public void removeQuestion(int index)
+    {
+        if (index >= 0 && index < questions_.Count)
+            questions_.RemoveAt(index);
+    }
 }

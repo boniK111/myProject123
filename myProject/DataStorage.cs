@@ -32,6 +32,11 @@ public class DataStorage
         }
     }
 
+    public void saveCategories(List<Category> categories)
+    {
+        File.WriteAllText(CategoriesFile, JsonSerializer.Serialize(categories, options));
+    }
+
     public List<TestResult> LoadResults()
     {
         if (!File.Exists(ResultsFile)) return new List<TestResult>();
@@ -45,5 +50,12 @@ public class DataStorage
             Console.WriteLine("Не удалось прочитать results.json.");
             return new List<TestResult>();
         }
+    }
+
+    public void SaveResult(TestResult result)
+    {
+        List<TestResult> results = LoadResults();
+        results.Add(result);
+        File.WriteAllText(ResultsFile, JsonSerializer.Serialize(results, options));
     }
 }
