@@ -5,7 +5,7 @@ public class MainMenu
     public string user_mode { get; private set; } = "";
     public List<Category> categories { get; private set; } = new();
     private readonly DataStorage storage = new();
-
+    //...
     public void Run()
     {
         while (true)
@@ -19,7 +19,7 @@ public class MainMenu
             string choice = Console.ReadLine() ?? "";
 
             if (choice == "1")
-            {
+            { 
                 if (login("admin"))
                 {
                     user_mode = "Administrator";
