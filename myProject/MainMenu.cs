@@ -1,9 +1,9 @@
-﻿
-namespace TestSystemCSharp;
+﻿namespace TestSystemCSharp;
 
 public class MainMenu
 {
     public string user_mode { get; private set; } = "";
+    private string currentUserName = "";
 
     public void Run()
     {
@@ -23,7 +23,7 @@ public class MainMenu
                     if (login("admin"))
                     {
                         user_mode = "Administrator";
-                        Console.WriteLine($"[вход выполнен] Режим: {user_mode}");
+                        new Administrator().Run();
                         logout();
                     }
                     break;
@@ -31,7 +31,8 @@ public class MainMenu
                     if (login("tested"))
                     {
                         user_mode = "Tested";
-                        Console.WriteLine($"[вход выполнен] Режим: {user_mode}");
+                        Tested tested = new() { name_ = currentUserName };
+                        tested.Run();
                         logout();
                     }
                     break;
@@ -55,6 +56,7 @@ public class MainMenu
                 Console.WriteLine("Неверный пароль.");
                 return false;
             }
+            currentUserName = "Администратор";
             Console.WriteLine("Добро пожаловать, Администратор.");
         }
         else if (mode == "tested")
@@ -66,6 +68,7 @@ public class MainMenu
                 Console.WriteLine("Имя не может быть пустым.");
                 return false;
             }
+            currentUserName = name;
             Console.WriteLine($"Добро пожаловать, {name}.");
         }
         return true;
@@ -74,6 +77,7 @@ public class MainMenu
     public void logout()
     {
         user_mode = "";
+        currentUserName = "";
         Console.WriteLine("Вы вышли из режима.");
     }
 }
