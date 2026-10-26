@@ -3,12 +3,15 @@
 public class Tested
 {
     public string name_ { get; set; } = "";
+    public List<Category> available_categories_ { get; set; } = new();
     public int total_points_ { get; set; }
 
     public void Run(List<Category> categories)
     {
         Console.WriteLine($"\n=== РЕЖИМ ТЕСТИРУЕМОГО ({name_}) ===");
         List<Category> available = categories.Where(c => c.is_active_ && c.questions_.Count > 0).ToList();
+        available_categories_ = available;
+
         if (available.Count == 0)
         {
             Console.WriteLine("Нет доступных категорий с вопросами.");
@@ -29,9 +32,16 @@ public class Tested
         }
 
         Category selected = available[n - 1];
-        Console.WriteLine($"[следующий шаг] Прохождение теста: {selected.name_}");
-        Console.Write("Нажмите Enter, чтобы выйти: ");
-        Console.ReadLine();
+        int points = startCategory(selected);
+        int maxPoints = selected.questions_.Sum(q => q.points_);
+        getResults();
+    }
+
+    public int startCategory(Category current_category)
+    {
+        current_category.start();
+        total_points_ += current_category.end();
+        return current_category.points_;
     }
 
     public void getResults()

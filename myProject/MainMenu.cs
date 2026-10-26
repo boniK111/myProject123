@@ -11,7 +11,7 @@ public class MainMenu
     {
         while (true)
         {
-            categories = loadCategories(); // автоподгрузка при каждом возврате в меню
+            categories = loadCategories();
             Console.WriteLine("\n=== СИСТЕМА ТЕСТИРОВАНИЯ ===");
             Console.WriteLine("1. Администратор");
             Console.WriteLine("2. Тестируемый");
@@ -34,8 +34,7 @@ public class MainMenu
                     if (login("tested"))
                     {
                         user_mode = "Tested";
-                        Tested tested = new() { name_ = currentUserName };
-                        tested.Run(categories);
+                        RunTestedMode();
                         logout();
                     }
                     break;
@@ -85,4 +84,34 @@ public class MainMenu
     }
 
     public List<Category> loadCategories() => storage.loadCategories();
+
+    private void RunTestedMode()
+    {
+        Tested tested = new() { name_ = currentUserName };
+        List<Category> available = loadCategories().Where(c => c.is_active_ && c.questions_.Count > 0).ToList();
+        tested.available_categories_ = available;
+
+        if (available.Count == 0) { Console.WriteLine("Нет доступных категорий с вопросами."); return; }
+
+        Console.WriteLine("Доступные категории:");
+        for (int i = 0; i < available.Count; i++)
+            Console.WriteLine($"{i + 1}. {available[i].name_} — {available[i].questions_.Count} вопросов");
+        Console.Write("Номер категории: ");
+        if (!int.TryParse(Console.ReadLine(), out int n) || n < 1 || n > available.Count)
+        { Console.WriteLine("Некорректный номер."); return; }
+
+        Category selected = available[n - 1];
+        int points = tested.startCategory(selected);
+        int maxPoints = selected.questions_.Sum(q => q.points_);
+        tested.getResults();
+        storage.SaveResult(new TestResult
+        {
+            StudentName = tested.name_,
+            CategoryName = selected.name_,
+            Points = points,
+            MaxPoints = maxPoints,
+            Date = DateTime.Now
+        });
+        Console.WriteLine("Результат сохранён в results.json.");
+    }
 }
